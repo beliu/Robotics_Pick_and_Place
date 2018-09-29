@@ -2,7 +2,6 @@
 
 I start by creating the Modified Danavit-Havaford (DH) Table to model the Kuka 210 Arm.
 The image below shows the joints, end-effector, and links of the robot. The point of view is looking at the arm directly from the side, so that the arm, with all the joints at 0, would rest entirely within the X-Z plane of the base reference frame. All the other frame origins and axes are shown, along with the DH parameters *a* and *d*.
-
 ![Robot Model for Making the DH Table](/images/Robot_Model.jpg)
 
 i            | alpha_i-1     | a_i-1         | d_i           | theta_i
@@ -19,5 +18,6 @@ EE           | 0             | 0             | 0.303         | 0
 Once you obtain the xyz coordinates of the wrist-center with respect to the base frame, then you can use geometry to calculate closed-form equations for the joint angles 1, 2, and 3.
 
 In order to calculate the joint 2 angle, I refered to the diagrame below:
-
 ![Geometry to Calculate Joint 2](/images/Inverse_Kinematics.jpg)
+Note that the length *A*, that is, the length that connects J3 to the WC, can be calculated using the parameters from the URDF file. Specifically, I use a_3 and d_4 to calculate *A*.
+![Calculating Distance from J3 to WC](/images/Calculate_A.jpg)
