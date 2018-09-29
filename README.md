@@ -22,7 +22,7 @@ In order to calculate the joint 2 angle, I refered to the diagram below:
 
 ![Geometry to Calculate Joint 2](/images/Inverse_Kinematics.png)
 
-Note that the length *A*, that is, the length that connects J3 to the WC, can be calculated using the parameters from the URDF file. Specifically, I use a_3 and d_4 to calculate *A*. 
+The diagram depicts the Kuka Arm with Joint 2 rotated at an angle of positive theta2 along its z-axis. The other joints have not rotated, and are therefore at 0. Note that the length *A*, that is, the length that connects J3 to the WC, can be calculated using the parameters from the URDF file. Specifically, I use a_3 and d_4 to calculate *A*. 
 
 ![Calculating Distance from J3 to WC](/images/Calculate_A.png)
 
