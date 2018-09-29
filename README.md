@@ -18,10 +18,15 @@ EE           | 0             | 0             | 0.303         | 0
 ### Inverse Kinematics
 Once you obtain the xyz coordinates of the wrist-center with respect to the base frame, then you can use geometry to calculate closed-form equations for the joint angles 1, 2, and 3.
 
-In order to calculate the joint 2 angle, I refered to the diagrame below:
+In order to calculate the joint 2 angle, I refered to the diagram below:
 
 ![Geometry to Calculate Joint 2](/images/Inverse_Kinematics.png)
 
-Note that the length *A*, that is, the length that connects J3 to the WC, can be calculated using the parameters from the URDF file. Specifically, I use a_3 and d_4 to calculate *A*.
+Note that the length *A*, that is, the length that connects J3 to the WC, can be calculated using the parameters from the URDF file. Specifically, I use a_3 and d_4 to calculate *A*. 
 
 ![Calculating Distance from J3 to WC](/images/Calculate_A.png)
+
+The length *C*, from J2 to J3, comes directly from the URDF file.
+The length *B* is calculated from the coordinates of the wrist center, w.r.t. the base reference frame. We can use the Pythagorean Theorem to calculate *B*, provided we know the lengths of the legs. Those lengths are called out in the diagram. Also, once we have the lengths of the legs of the right triangle whose hypotenuse is *B*, we can also calculate the angle *beta* shown in the diagram. 
+
+After we have the lengths of the triangle *ABC*, we can use the Law of Cosines to calculate the angle *a*. Therefore, from the diagram, we see that *theta2 = 90 deg - a - beta*.
