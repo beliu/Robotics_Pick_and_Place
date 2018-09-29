@@ -18,6 +18,14 @@ EE           | 0             | 0             | 0.303         | 0
 ### Inverse Kinematics
 Once you obtain the xyz coordinates of the wrist-center with respect to the base frame, then you can use geometry to calculate closed-form equations for the joint angles 1, 2, and 3.
 
+First, I refered to the diagram below to calculate the joint 1 angle:
+
+![Geometry to Calculate Joint 1](/images/Inverse_Kinematics_q1.png)
+
+The diagram depicts the Kuka Arm with just Joint 1 and the Wrist center, looking from a top-down view. Therefore, the entire arm is captured in the X-Y plane of Joint 1's reference frame. The angle theta 1 is simply the inverse tan of the y and x component of the wrist center, w.r.t. the base reference frame.
+
+![Theta 1](/images/theta1.png)
+
 In order to calculate the joint 2 angle, I refered to the diagram below:
 
 ![Geometry to Calculate Joint 2](/images/Inverse_Kinematics_q2.png)
