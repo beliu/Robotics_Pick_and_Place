@@ -20,21 +20,21 @@ from sympy import *
 
 # These are helper functions for use in building transformation matrices
 def rot_x(q):
-    R_x = Matrix([[1, 0, 0],
-                    [0, cos(q), -sin(q)],
-                    [0, sin(q), cos(q)]])
+    R_x = Matrix([[1,      0,       0],
+                  [0, cos(q), -sin(q)],
+                  [0, sin(q),  cos(q)]])
     return R_x
 
 def rot_y(q):    
-    R_y = Matrix([[cos(q), 0, sin(q)],
-                    [0, 1, 0],
-                    [-sin(q), 0, cos(q)]])
+    R_y = Matrix([[cos(q),  0, sin(q)],
+                  [0,       1,      0],
+                  [-sin(q), 0, cos(q)]])
     return R_y           
 
 def rot_z(q):    
     R_z = Matrix([[cos(q), -sin(q), 0],
-                    [sin(q), cos(q), 0],
-                    [0, 0, 1]])
+                  [sin(q),  cos(q), 0],
+                  [0,            0, 1]])
     return R_z
 
 def t_x(a):
@@ -58,8 +58,7 @@ def handle_calculate_IK(req):
     if len(req.poses) < 1:
         print "No valid poses received"
         return -1
-    else:
-        
+    else:    
         ### Your FK code here
         # Create symbols
     	# The Revolute Joints (theta's)
@@ -159,9 +158,9 @@ def handle_calculate_IK(req):
 
             ### Your IK code here
             # Compensate for rotation discrepancy between DH parameters and Gazebo
-            R_corr = rot_x(pi) * rot_y(-pi/2)
-            R_rpy = rot_z(yaw) * rot_y(pitch) * rot_x(roll)
-            R_rpy_corr =  R_rpy * R_corr
+            # R_corr = rot_z(pi) * rot_y(-pi/2)
+            R_corr = rot_x(pi) * rot_y(pi/2)
+            R_rpy = rot_z(yaw) * rot_y(pitch) * rot_x(roll) * R_corr
             d_l = 0.303 # The distance from the wrist center to the gripper joint
 
             # Calculate the wrist position w.r.t. base origin
