@@ -5,7 +5,7 @@ The image below shows the joints, end-effector, and links of the robot. The poin
 
 ![Robot Model for Making the DH Table](/images/Robot_Model.jpg)
 
-i            | $\alpha$    | a_i-1         | d_i           | theta_i
+i            | $alpha$    | a_i-1         | d_i           | theta_i
 ------------ | ------------- | ------------- | ------------- | -------------
 1            | 0             | 0             | 0.75          | theta1
 2            | -pi/2         | 0.35          | 0             | theta2 - pi/2
