@@ -8,4 +8,9 @@ The image below shows the joints, end-effector, and links of the robot. The poin
 i            | alpha_i-1     | a_i-1         | d_i           | theta_i
 ------------ | ------------- | ------------- | ------------- | -------------
 1            | 0             | 0             | 0.75          | theta1
-1            | 0             | 0             | 0.75          | theta1
+2            | -pi/2         | 0.35          | 0             | theta2 - pi/2
+3            | 0             | 1.25          | 0             | theta3
+4            | -pi/2         | -0.054        | 1.5           | theta4
+5            | pi/2          | 0             | 0             | theta5
+6            | -pi/2         | 0             | 0             | theta6
+EE           | 0             | 0             | 0.303         | 0
