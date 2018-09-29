@@ -20,7 +20,7 @@ Once you obtain the xyz coordinates of the wrist-center with respect to the base
 
 In order to calculate the joint 2 angle, I refered to the diagram below:
 
-![Geometry to Calculate Joint 2](/images/Inverse_Kinematics.png)
+![Geometry to Calculate Joint 2](/images/Inverse_Kinematics_q2.png)
 
 The diagram depicts the Kuka Arm with Joint 2 rotated at an angle of positive theta2 along its z-axis. The other joints have not rotated, and are therefore at 0. Note that the length *A*, that is, the length that connects J3 to the WC, can be calculated using the parameters from the URDF file. Specifically, I use a_3 and d_4 to calculate *A*. 
 
@@ -33,6 +33,6 @@ After we have the lengths of the triangle *ABC*, we can use the Law of Cosines t
 
 Next, I calculate the closed-form equation for Joint 3. To do so, I refer to the diagram below.
 
-![Geometry to Calculate Joint 3](/images/Inverse_Kinematics q3.png)
+![Geometry to Calculate Joint 3](/images/Inverse_Kinematics_q3.png)
 
 In the configuration above, I have Joint 2 at 0 degrees and Joint 3 rotated at an angle of theta3 in the positive direction along its z-axis. The two perpendicular dotted gray lines centered at Joint 3 represent the original XY-axes before rotation and the dotted black lines represent the new XY-axes after a rotation of theta3. From the diagram, we see that *theta3 = 90 deg - b - gamma*, where b is the angle between legs A and C and gamma is the angle the link length *a_3* and the link displacement *d_4*. 
