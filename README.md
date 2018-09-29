@@ -1,3 +1,5 @@
 # Robotics_Pick_and_Place
 
-A repository for the Kuka 210 Pick and Place Code.
+I start by creating the Modified Danavit-Havaford (DH) Table to model the Kuka 210 Arm.
+
+
