@@ -29,7 +29,9 @@ The diagram depicts the Kuka Arm with Joint 2 rotated at an angle of positive th
 The length *C*, from J2 to J3, comes directly from the URDF file.
 The length *B* is calculated from the coordinates of the wrist center, w.r.t. the base reference frame. We can use the Pythagorean Theorem to calculate *B*, provided we know the lengths of the legs. Those lengths are called out in the diagram. Also, once we have the lengths of the legs of the right triangle whose hypotenuse is *B*, we can also calculate the angle *beta* shown in the diagram. 
 
-After we have the lengths of the triangle *ABC*, we can use the Law of Cosines to calculate the angle *a*. Therefore, from the diagram, we see that *theta2 = 90 deg - a - beta*.
+After we have the lengths of the triangle *ABC*, we can use the Law of Cosines to calculate the angle *a*. Therefore, from the diagram, we see that 
+
+![Theta 2](/images/theta2.png)
 
 Next, I calculate the closed-form equation for Joint 3. To do so, I refer to the diagram below.
 
