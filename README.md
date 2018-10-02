@@ -41,9 +41,10 @@ Finally, we can extract the rotation portion of the transform from the base link
 
 ![Final equivalence](/images/orientation_equals.png)
 
+In my code, I perform each of the steps above in lines 65 to 138. The matrices and muliplitcations can be made using python's *sympy* library. I wrote out the equation with symbols and formatting for this writeup using LibreOffice's Math Editor application.s
 
-### Inverse Kinematics
-Once you obtain the xyz coordinates of the wrist-center with respect to the base frame, then you can use geometry to calculate closed-form equations for the joint angles 1, 2, and 3.
+### Inverse Kinematics - Position Analysis (Joints 1, 2, and 3)
+Once you obtain the xyz coordinates of the wrist-center with respect to the base frame, then you can use geometry to calculate closed-form equations for the joint angles 1, 2, and 3. These three joints make up the position analysis of the end-effector, as it is these three joints that determine the XYZ coordinates of the gripper.s With the Kuka 210 arm, the position and the orientation of the gripper are decoupled, and can thus be solved separately.s
 
 First, I refered to the diagram below to calculate the joint 1 angle:
 
@@ -77,3 +78,42 @@ In the configuration above, I have Joint 2 at 0 degrees and Joint 3 rotated at a
 ![Theta 3](/images/theta3.png) 
 
 where b is the angle between legs A and C and gamma is the angle the link length *a_3* and the link displacement *d_4*. 
+One interesting thing to note is that based on the geometry of the links, theta 2 and theta 3 are actually dependent. This is because the length that joins joint 2 to the wrist center changes as joint 3 changes. Since that length is used to calculate theta 2, we see that theta 2 depends on theta 3. Theta 3 can actually have a positive or a negative solution and this contributes to occurance of multiple solutions to the joints. If theta 3 is positive, then this leads to a configuration where the robot arm must have joint 2 facing upwards (likened to an elbow up configuration). If theta 3 is negative, then this leads to an "elbow-down" configuration. I experimented with both positive and negative values for theta3 and found an elbow-up configuration led to smoother movements, so I kept theta3 positive for project.
+
+
+Note that within my code, the calculations for these joints are done from lines 160 to 188.
+
+### Inverse Kinematics - Orientation Analysis (Joints 4, 5, and 6)
+After we obtain the rotations for joints 1, 2, and 3, we can solve for the remaining joints algebraically. We have enough information to create the *R0_3* matrix with no unknown variables. We are therefore able to solve the equivalence equation below:
+
+![Final equivalence](/images/orientation_equals.png)
+
+We also know the right-hand-side of the equation from ROS, and so if we multiply by the transpose of R0_3 to both sides, we can isolate R3_EE.
+
+![r3_EE](/images/r3_ee.png)
+
+The *R3_EE* matrix contains the rotations of the wrist joints to match the orientation of the end-effector. Looking only at the rotations, we know that the entire set of rotations of the wrist joints are as follows:
+
+![wrist_rotations](/images/wrist_rotations.png)
+
+Note that the end-effector is fixed to joint 6 so it has no rotation of its own w.r.t. joint 6. If we are to expand the equation above in matrix form, we end up with this:
+
+![ee_rpy_equals](/images/ee_rpy_equals.png)
+
+All the entries in the matrix on the right-hand-side are known (from R_rpy) so we can re-arrange terms and use arctan to solve for the values of theta4m, theta5, and theta6:
+
+![theta4](/images/theta4.png)
+![theta5](/images/theta5.png)
+![theta6](/images/theta6.png)
+
+From my code, I perform these steps from line 196 to 200.
+
+There is one final step I took to try to smoothen out the motion of the wrist. The atan2 function only returns values in the range (-180, 180). However, joint's 4 and 6 have the range -350 to 350 degrees. Using the algebraic formulas above, if joint 4 for example moves from 179 to 181, then the calculation would return -179 degrees for 181, since 181 is in the third quadrant of the trigonmetric quadrant. An easy fix is to add 360 (or 2pi) to the result (so -179 + 360 = 181). On the other hand, if joint 4 is -179 and moves to -181, then atan2 will return 179 instead of -181. The fix is similar, but this time we subtract 360 from the result (so 179 - 360 = -181). These fixes for joint 4 also apply to joint 6. In my code, I implement these fixes from lines 202 to 215.
+
+### Arm Pick and Place
+Now that we have forward and inverse kinematics in place, and coded up, I ran ROS to go through 10 pick-and-place runs with randomly placed targets. The following shows the progress of the arm as it picks up the target and drops them in the bin.
+
+
+
+
+Since *R0_3* is a homogenous matrix, we can take the transpose of this matrix and cancel it out
