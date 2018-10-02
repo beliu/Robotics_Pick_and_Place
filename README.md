@@ -15,6 +15,29 @@ i            | alpha_i-1     | a_i-1         | d_i           | theta_i
 6            | -pi/2         | 0             | 0             | theta6
 EE           | 0             | 0             | 0.303         | 0
 
+Now consider the transform from a joint i-1 to joint i. It consists of 4 separate transformations, as shown in the figure below:
+![Transform from Joint i-1 to i](/images/transform_eqn.png)
+
+To write it out in full, the homogenous transformation matrix would look like this:
+![Full Transform Matrix](/images/transform_matrix.png)
+
+We can use the two equations above to create a homogeneous matrix from the base link to the end-effector by post-multiplying each joint's transformation matrix from link 1 to the end-effector. 
+
+![Base to End-Effector Transforms](/images/transform_mult.png)
+
+At the same time, we can get the roll-pitch-yaw orientation angles of the end-effector from ROS. These angles are given with respect to the base link and are applied extrinsically around the base link's reference frame. Therefore, we obtain the final rotation matrix by pre-multiplying the rotations, as shown in the figure below:
+
+![RPY Extrinsic Rotations](/images/rpy_rotations.png)
+
+For both applications, we are going from the base link to the end-effector. Therefore, both applications should result in the same matrix. There is however a correction we have to apply to the extrinsic rotations first before we can set that transformation matrix equal to the one we get by post-multiplying each joint's transform. This correction transforms the reference frame from the URDF frame to the DH frame. The roll-pitch-yaw rotation matrix *R_rpy* will be w.r.t. the URDF frame. In that frame, the Z axis is pointing upwards and the X axis is pointing along the length of the end-effector. The DH frame is that shown in the first diagram of the robot arm. The X axis is pointing up and the Z axis is along the length of the end-effector. To go from URDF to DH frame, we apply this correction:
+
+![URDF to DH Correction](/images/urdf_dh_corr.png)
+
+We can extract the rotation portion of the transform from the base link to the end-effector by taking the first 3 columns and 3 rows of the total transform matrix. The final equivalence we are interested in is this:
+
+![Final equivalence](/images/orientation_equals.png)
+
+
 ### Inverse Kinematics
 Once you obtain the xyz coordinates of the wrist-center with respect to the base frame, then you can use geometry to calculate closed-form equations for the joint angles 1, 2, and 3.
 
