@@ -86,7 +86,7 @@ def handle_calculate_IK(req):
              alpha6:      0, a6:      0, d_g: 0.303, q_g: 0}
 
     	# Define Modified DH Transformation matrix
-        # Perform all the transformations from joint 0 to 1
+        # Perform all the transformations from joint i-1 to i
     	T0_1_x = make_htm(rot_x(alpha0), t_x(a0))
         T0_1_z = make_htm(rot_z(q1), t_z(d1))
 
@@ -133,10 +133,8 @@ def handle_calculate_IK(req):
     	# Extract rotation matrices from the transformation matrices
         T0_3 = T0_1 * T1_2 * T2_3
         R0_3 = T0_3[0:3, 0:3]
-    	T0_6 = T0_3 * T3_4 * T4_5 * T5_6
-        R0_6 = T0_6[0:3, 0:3]
         ###
-
+        
         # Initialize service response
         joint_trajectory_list = []
         for x in xrange(0, len(req.poses)):
@@ -150,17 +148,15 @@ def handle_calculate_IK(req):
             py = req.poses[x].position.y
             pz = req.poses[x].position.z
 
-            # print('End Effector Positions: ', px, py, pz)
-
             (roll, pitch, yaw) = tf.transformations.euler_from_quaternion(
                 [req.poses[x].orientation.x, req.poses[x].orientation.y,
                     req.poses[x].orientation.z, req.poses[x].orientation.w])
 
             ### Your IK code here
             # Compensate for rotation discrepancy between DH parameters and Gazebo
-            # R_corr = rot_z(pi) * rot_y(-pi/2)
-            R_corr = rot_x(pi) * rot_y(pi/2)
+            R_corr = rot_x(pi) * rot_y(pi/2)    # This converts from URDF to DH frame
             R_rpy = rot_z(yaw) * rot_y(pitch) * rot_x(roll) * R_corr
+            R_rpy = R_rpy.evalf()
             d_l = 0.303 # The distance from the wrist center to the gripper joint
 
             # Calculate the wrist position w.r.t. base origin
@@ -172,31 +168,52 @@ def handle_calculate_IK(req):
             theta1 = atan2(wy, wx)  # Joint 1 angle
             
             C = 1.25    # Distance from J2 to J3
-            A = sqrt(0.054**2 + (0.96 + 0.54)**2)   # Distance from J3 to WC
-            d_2_wc_x = sqrt(wx**2 + wy**2) - 0.35   # Horizontal distance from J2 to WC
+            A = sqrt(0.054**2 + (0.96 + 0.54)**2).evalf()   # Distance from J3 to WC
+            d_2_wc_x = (sqrt(wx**2 + wy**2) - 0.35).evalf()   # Horizontal distance from J2 to WC
             d_2_wc_z = wz - 0.75    # Vertical distance from J2 to WC
-            B = sqrt(d_2_wc_z**2 + d_2_wc_x**2)  # Distance from J2 to WC
-            a = acos((B**2 + C**2 - A**2)/(2*B*C))  # Angle between C and B
-            beta = atan2(d_2_wc_z, d_2_wc_x)    # Angle the vector from J2 to WC makes with the horizontal
-            theta2 = pi/2 - a - beta    # Joint 2 angle
+            B = sqrt(d_2_wc_z**2 + d_2_wc_x**2).evalf()  # Distance from J2 to WC
 
-            b = acos((A**2 + C**2 - B**2)/(2*A*C))  # Angle between C and A
+            num = float(B**2 + C**2 - A**2)
+            den = float(2*B*C)  
+            a = acos(num/den)
+            beta = atan2(d_2_wc_z, d_2_wc_x)    # Angle the vector from J2 to WC makes with the horizontal
+            theta2 = (pi/2 - a - beta).evalf()    # Joint 2 angle
+
+            num = float(A**2 + C**2 - B**2)
+            den = float(2*A*C)
+            b = acos(num/den)  # Angle between C and A
             gamma = atan2(0.054, 1.50)  # Angle the vector from J3 to WC makes with the horizontal
-            theta3 = pi/2 - b - gamma   # Joint 3 angle
+            theta3 = (pi/2 - b - gamma).evalf()   # Joint 3 angle
 
             ## Calculate the last 3 joint angles
-            R0_3 = R0_3.subs({q1: theta1, q2: theta2, q3: theta3})
-            R3_6 = R0_3.inv('LU') * R_rpy
+            R3_6 = (transpose(R0_3.evalf(subs = {q1: theta1, q2: theta2, q3: theta3})) * R_rpy).evalf()
+            
+            # The wrist joints can be calculated algebraically from the roll-pitch-yaw matrix
+            theta4 = atan2(R3_6[2, 2], -R3_6[0, 2]).evalf()
+            theta5 = atan2(sqrt(R3_6[0, 2]*R3_6[0, 2] + R3_6[2, 2]*R3_6[2, 2]), R3_6[1, 2]).evalf()
+            theta6 = atan2(-R3_6[1, 1], R3_6[1, 0]).evalf()
+            # Try to smoothen out the rotations of the wrist joints, because atan2 can jump from positive to negative rotations (and vice versa)
+            if (len(joint_trajectory_list) > 1):
+                q4_prev = joint_trajectory_list[-1].positions[-3]
+                q6_prev = joint_trajectory_list[-1].positions[-1]
 
-            theta4 = atan2(R3_6[2, 2], -R3_6[0, 2])
-            theta5 = atan2(sqrt(R3_6[0, 2]**2 + R3_6[2, 2]**2), R3_6[1, 2])
-            theta6 = atan2(-R3_6[1, 1], R3_6[1, 0] )
-            ###
+                # Expand the range of joint 4 and 6 beyond the [-180, 180] limitations of atan2
+                if ((q4_prev > (pi/2)) & (theta4 < (-pi/2))):
+                    theta4 = (theta4 + 2*pi).evalf()    # Keep pushing angle above 180, or else atan2 will return negative values
+                elif ((q4_prev < (-pi/2)) & (theta4 > (pi/2))):
+                    theta4 = (theta4 - 2*pi).evalf()    # Keep pushing angle more negative than -180, or else atan2 will return positive values
+
+                if ((q6_prev > (pi/2)) & (theta6 < (-pi/2))):
+                    theta6 = (theta6 + 2*pi).evalf()
+                elif ((q6_prev < (-pi/2)) & (theta6 > (pi/2))):
+                    theta6 = (theta6 - 2*pi).evalf()
 
             # Populate response for the IK request
             # In the next line replace theta1,theta2...,theta6 by your joint angle variables
             joint_trajectory_point.positions = [theta1, theta2, theta3, theta4, theta5, theta6]
             joint_trajectory_list.append(joint_trajectory_point)
+
+
 
         rospy.loginfo("length of Joint Trajectory List: %s" % len(joint_trajectory_list))
         return CalculateIKResponse(joint_trajectory_list)
