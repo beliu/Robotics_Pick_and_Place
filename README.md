@@ -33,7 +33,11 @@ For both applications, we are going from the base link to the end-effector. Ther
 
 ![URDF to DH Correction](/images/urdf_dh_corr.png)
 
-We can extract the rotation portion of the transform from the base link to the end-effector by taking the first 3 columns and 3 rows of the total transform matrix. The final equivalence we are interested in is this:
+If we post-multiply *R_rpy* by this correction matrix, then we get the end-effector orientation in the DH reference frame. We can also obtain the XYZ coordinates of the end-effector w.r.t. the base link directly from ROS. Once we have the orientation and the position of the end-effector, we can build the homogenous transform matrix from the base link to the end-effector.
+
+![Base to End Effector Transform](/images/base_end_transform.png)
+
+Finally, we can extract the rotation portion of the transform from the base link to the end-effector by taking the first 3 columns and 3 rows of the total transform matrix. The final equivalence we are interested in is this:
 
 ![Final equivalence](/images/orientation_equals.png)
 
