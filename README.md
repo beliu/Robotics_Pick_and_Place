@@ -113,7 +113,19 @@ There is one final step I took to try to smoothen out the motion of the wrist. T
 ### Arm Pick and Place
 Now that we have forward and inverse kinematics in place, and coded up, I ran ROS to go through 10 pick-and-place runs with randomly placed targets. The following shows the progress of the arm as it picks up the target and drops them in the bin.
 
+**Reaching Target**
+![Reaching Target](/images/pick-place-1.png)
 
+**Picking Up Target**
+![Picking Target](/images/pick-place-2.png)
 
+**Moving Target**
+![Moving Target](/images/pick-place-3.png)
 
-Since *R0_3* is a homogenous matrix, we can take the transpose of this matrix and cancel it out
+**Dropping Target**
+![Dropping Target](/images/pick-place-4.png)
+
+The image shows several targets already dropped into the bin.
+
+### Discussion
+Although the arm can pick up targets and drop them in the bin, I feel there are still several improvements to be made. First, the joints still undergo unncessary movements when a much simpler movement is possible. I believe part of this is due to the fact that the equations for the wrist joints are independent of one another. Encoding dependencies between the joints would allow them to interpret the movement of one joints and then compensate for that movement with the other joints. Second, I would like to be able to better calculate the different paths of the robot on the fly and then be able to select the most efficient path. In this case, efficiency would mean reducing the movements of each joint, which in the real-world would correspond to less energy consumed to move the robot. 
