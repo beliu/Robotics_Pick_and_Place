@@ -16,6 +16,7 @@ i            | alpha_i-1     | a_i-1         | d_i           | theta_i
 EE           | 0             | 0             | 0.303         | 0
 
 Now consider the transform from a joint i-1 to joint i. It consists of 4 separate transformations, as shown in the figure below:
+
 ![Transform from Joint i-1 to i](/images/transform_eqn.png)
 
 To write it out in full, the homogenous transformation matrix would look like this:
@@ -100,7 +101,7 @@ Note that the end-effector is fixed to joint 6 so it has no rotation of its own 
 
 ![ee_rpy_equals](/images/ee_rpy_equals.png)
 
-All the entries in the matrix on the right-hand-side are known (from R_rpy) so we can re-arrange terms and use arctan to solve for the values of theta4m, theta5, and theta6:
+All the entries in the matrix on the right-hand-side are known (from R_rpy) so we can re-arrange terms and use arctan to solve for the values of theta4, theta5, and theta6:
 
 ![theta4](/images/theta4.png)
 ![theta5](/images/theta5.png)
